@@ -1,0 +1,9 @@
+.github/
+.appends
+.gitignore
+.gitattributes
+.dockerignore
+.git
+Dockerfile
+LICENSE
+*.md

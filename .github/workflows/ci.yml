@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.github/CODEOWNERS'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.github/CODEOWNERS'
+
+env:
+  SWIFT_VERSION: "6.2"
+
+jobs:
+  run-nim-compiler-in-docker-contain:
+    name: Build image and run nim compiler inside
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+    - name: Build base image
+      run: docker build -t "exercism/swift-docker-base:${SWIFT_VERSION}" .
+
+    - name: Create container from base image
+      run: |
+        docker create \
+          --name test-swift-docker-base \
+          --entrypoint bin/test-image-entrypoint.sh \
+          -v "${{ github.workspace }}/src/TestTool:/tmp/TestTool:ro" \
+          "exercism/swift-docker-base:${SWIFT_VERSION}"
+
+    - name: Run container
+      run: docker start -a test-swift-docker-base
