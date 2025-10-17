@@ -5,7 +5,11 @@
 ## Modified for custom build or additional setup.
 
 FROM ubuntu:24.04
-LABEL description="Docker Container for the Swift Exercism track"
+
+LABEL org.opencontainers.image.title="Exercism Swift Docker Image"
+LABEL org.opencontainers.image.description="Docker Container for the Swift Exercism track"
+LABEL org.opencontainers.image.source=https://github.com/exercism/swift-docker-base
+LABEL org.opencontainers.image.licenses="AGPL-3.0 License"
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && apt-get -q update && \
     apt-get -q install -y \
@@ -26,6 +30,15 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && ap
     pkg-config \
     tzdata \
     zlib1g-dev \
+    ## 
+    ## Customization for Exercism Swift Track.
+    ##
+    upx-ucl \
+    && apt-get -y autoremove \
+    && apt-get -yq clean \
+    ##
+    ## End of customization.
+    ##
     && rm -r /var/lib/apt/lists/*
 
 # Everything up to here should cache nicely between Swift versions, assuming dev dependencies change little
@@ -68,31 +81,61 @@ RUN set -e; \
     && curl -fsSL "$SWIFT_BIN_URL" -o swift.tar.gz "$SWIFT_SIG_URL" -o swift.tar.gz.sig \
     && gpg --batch --quiet --keyserver keyserver.ubuntu.com --recv-keys "$SWIFT_SIGNING_KEY" \
     && gpg --batch --verify swift.tar.gz.sig swift.tar.gz \
-    # - Unpack the toolchain, set libs permissions, and clean up.
-    && tar -xzf swift.tar.gz --directory / --strip-components=1 \
     ## 
     ## Customization for Exercism Swift Track.
     ## Removing unneeded tools and libraries to reduce image size.
     ##
-    && rm \
+    # - Unpack the toolchain, set libs permissions, and clean up.
+    # --touch updates the timestamps to now, so we can later find files modified during this build
+    && tar -xzf swift.tar.gz --directory / --strip-components=1 --touch \
+    && rm -v \
         /usr/lib/liblldb.so* \
         /usr/lib/libsourcekitdInProc.so \
-        /usr/lib/libswiftDemangle.so \
-        /usr/lib/libSwiftSourceKitClientPlugin.so \
+        /usr/lib/libclang.so.* \
+        /usr/lib/libLTO.so.* \
         /usr/lib/libSwiftSourceKitPlugin.so \
-        /usr/bin/docc \
-        /usr/bin/lld \
-        /usr/bin/lldb \
-        /usr/bin/lldb-argdumper \
-        /usr/bin/lldb-dap \
-        /usr/bin/lldb-server \
+        /usr/lib/libSwiftSourceKitClientPlugin.so \
+        /usr/lib/libswiftDemangle.so \
         /usr/bin/sourcekit-lsp \
+        /usr/bin/lldb-server \
+        /usr/bin/lld \
+        /usr/bin/clangd \
+        /usr/bin/docc \
         /usr/bin/swift-format \
-        /usr/bin/swift-plugin-server \
+        /usr/bin/swift-build-sdk-interfaces \
+        /usr/bin/llvm-objdump \
+        /usr/bin/llvm-ar \
+        /usr/bin/swift-help \
         /usr/bin/wasmkit \
+        /usr/bin/llvm-profdata \
+        /usr/bin/llvm-symbolizer \
+        /usr/bin/llvm-cov \
+        /usr/bin/llvm-objcopy \
+        /usr/bin/swift-demangle \
+        /usr/bin/swift-build-tool \
+        /usr/bin/lldb-dap \
+        /usr/bin/lldb \
+        /usr/bin/plutil \
+        /usr/bin/lldb-argdumper \
+        /usr/bin/swift-plugin-server \
+        /usr/bin/repl_swift \
+    && rm -v \
+        /usr/libexec/swift/linux/swift-backtrace-static \
+        /usr/libexec/swift/linux/swift-backtrace \
     && rm -r \
         /usr/lib/swift_static \
         /usr/lib/swift/embedded \
+        /usr/lib/swift/FrameworkABIBaseline \
+    ## Remove files modified during this build (those we touched during tar extraction)
+    && find /usr/share/docc -type f -mmin -10 -exec rm -v {} \; \
+    && find /usr/share/pm -type f -mmin -10 -exec rm -v {} \; \
+    && find /usr/local -type f -mmin -10 -exec rm -v {} \; \
+    ## Strip and upx compress files modified during this build
+    && find /usr/lib -name "*.so" -mmin -10 \
+        -exec sh -c 'printf "Modifying: %s\n" "$1" && strip "$1"' _ {} \; \
+    && find /usr/bin -type f -perm /111 ! -name "*.*" -mmin -10 \
+        -exec sh -c 'printf "Modifying: %s\n" "$1" && strip "$1"' _ {} \; \
+    # && upx --fast "$1"
     ##
     ## End of customization.
     ##

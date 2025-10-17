@@ -13,6 +13,7 @@ on:
 
 env:
   SWIFT_VERSION: "6.2"
+  PROJECT_PATH: "${{ github.workspace }}"
 
 jobs:
   run-swift-compiler-in-docker-contain:
@@ -23,20 +24,5 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
-    - name: Build base image
-      run: docker build -t "exercism/swift-docker-base:${SWIFT_VERSION}" .
-
-    - name: Create container from base image
-      run: |
-        docker create \
-          --name test-swift-docker-base \
-          --entrypoint /bin/bash \
-          -v "${{ github.workspace }}/bin/test-image-entrypoint.sh:/tmp/test-image-entrypoint.sh:ro" \
-          -v "${{ github.workspace }}/src/TestTool:/tmp/TestTool" \
-          "exercism/swift-docker-base:${SWIFT_VERSION}" \
-          -c "/tmp/test-image-entrypoint.sh"
-
-    - name: Run container
-      run: |
-        docker start -a test-swift-docker-base
-        docker rm test-swift-docker-base
+    - name: Build & test image
+      run: ./bin/ci_build.sh
