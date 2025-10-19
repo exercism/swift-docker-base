@@ -12,7 +12,7 @@ DOCKER_IMAGE_NAME="test-swift-docker-base"
 PROJECT_PATH="${PROJECT_PATH:-$PWD}"
 
 printf "Building and testing %s\n" "${DOCKER_IMAGE_PATH}"
-docker build --progress=plain -t "${DOCKER_IMAGE_PATH}" .
+docker build -t "${DOCKER_IMAGE_PATH}" .
 
 printf "Creating container from %s\n" "${DOCKER_IMAGE_PATH}"
 if docker ps -a --format '{{.Names}}' | grep -q "^${DOCKER_IMAGE_NAME}$"; then

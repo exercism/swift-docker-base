@@ -5,5 +5,6 @@
 .dockerignore
 .git
 Dockerfile
-LICENSE
 *.md
+!licenses
+!LICENSE.md

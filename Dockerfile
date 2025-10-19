@@ -1,8 +1,6 @@
-## Swift Docker image
-## Based on the official Swift Docker repository:
-## https://github.com/swiftlang/swift-docker
-##
-## Modified for custom build or additional setup.
+# Derived from https://github.com/swiftlang/swift-docker (Apache License 2.0)
+# SPDX-FileCopyrightText: 2025 Exercism and contributors
+# SPDX-License-Identifier: Apache-2.0
 
 FROM ubuntu:24.04
 
@@ -140,6 +138,8 @@ RUN set -e; \
     && chmod -R o+r /usr/lib/swift \
     && rm -rf "$GNUPGHOME" swift.tar.gz.sig swift.tar.gz \
     && apt-get purge --auto-remove -y curl
+
+COPY LICENSE.md licenses/LICENSE-APACHE-2.0.md ~/
 
 # Print Installed Swift Version
 RUN swift --version
