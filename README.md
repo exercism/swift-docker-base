@@ -21,9 +21,10 @@ To reduce image size the following techics are applied:
 
 ## License
 
-This repository includes one modified file from [swiftlang/swift-docker][swift-docker-image], originally licensed under the Apache License 2.0.
+This repository includes [Dockerfile][dockerfile] from [swiftlang/swift-docker][swift-docker-image], originally licensed under the Apache License 2.0.
 The rest of the repository is licensed under the AGPL-3.0.
 
+[dockerfile]: Dockerfile
 [swift-test-runner]: https://github.com/exercism/swift-test-runner
 [swift-docker-image]: https://github.com/swiftlang/swift-docker
 [docker]: https://www.docker.com/get-started/
