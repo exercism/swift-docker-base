@@ -18,7 +18,7 @@ env:
 jobs:
   run-swift-compiler-in-docker-contain:
     name: Build image and run swift test inside
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
     - name: Checkout code
