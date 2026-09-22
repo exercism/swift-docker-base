@@ -1,4 +1,4 @@
-name: Sync Labels
+name: Tools
 
 on:
   push:
