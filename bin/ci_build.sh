@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-SWIFT_VERSION=6.2
+SWIFT_VERSION=6.4
 DOCKER_IMAGE_PATH="exercism/swift-docker-base:${SWIFT_VERSION}"
 DOCKER_IMAGE_NAME="test-swift-docker-base"
 PROJECT_PATH="${PROJECT_PATH:-$PWD}"

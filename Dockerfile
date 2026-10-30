@@ -143,7 +143,7 @@ RUN set -e; \
     && rm -rf "$GNUPGHOME" swift.tar.gz.sig swift.tar.gz \
     && apt-get purge --auto-remove -y curl
 
-COPY LICENSE LICENSE-APACHE-2.0 ~/
+COPY LICENSE LICENSE-APACHE-2.0 /
 
 # Print Installed Swift Version
 RUN swift --version
